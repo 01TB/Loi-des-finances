@@ -1,0 +1,244 @@
+
+Modèle Conceptuel de Données (MCD) — Version 1
+Projet : Budget des Citoyens (BDC) — Loi de Finances 2025
+Fichier : conception-v1.txt
+Date : 2025-10-19
+
+But : fournir un MCD complet pour stocker les données nécessaires à la génération des tableaux et figures listés dans `summary.txt` et le PDF `BDC-LF-2025-VF.pdf`. Le modèle privilégie la clarté, la normalisation (3NF) et la traçabilité des sources (tableau/figure, année, source de financement).
+
+1. Règles générales et vocabulaire
+- Observation : une mesure observée (valeur économique) liée à une entité (ex : Recette, Dépense) pour une période, une catégorie, et éventuellement un organe administratif.
+- Période : année budgétaire (ex : 2025). Le modèle permet plusieurs années pour séries temporelles.
+- Granularité : niveau agrégé (rubrique, poste budgétaire, source de recette, type de dépense) et, si disponible, granularité par ministère/administration.
+
+2. Entités principales (liste synthétique)
+- Periode(Annee)
+- SourceRecette (id_source_recette, code, libelle, type: 'fiscale'|'douaniere'|'non-fiscale'|'don')
+- Recette (id_recette, periode_id, source_recette_id, montant, unite, commentaire, source_tableau_figure_id)
+- TypeDepense (id_type_depense, code, libelle, nature_economique: ex 'fonctionnement','investissement','interets','solde_pensions')
+- PosteBudgetaire (id_poste, code_poste, libelle_poste, type_depense_id)
+- Depense (id_depense, periode_id, poste_budgetaire_id, montant, unite, beneficiary_admin_id, source_tableau_figure_id, commentaire)
+- Administration (id_admin, code_admin, nom, niveau: 'central'|'deconcentre'|'autre')
+- Dette (id_dette, periode_id, type_dette, montant_interet, montant_principal, commentaire, source_tableau_figure_id)
+- Don (id_don, periode_id, donneur, montant, type_aide, affectation, source_tableau_figure_id)
+- SoldePension (id_solde, periode_id, categorie_personnel, montant, nombre_beneficiaires, source_tableau_figure_id)
+- Investissement (id_invest, periode_id, projet, montant, source_financement, commentaire, source_tableau_figure_id)
+- SourceFinancement (id_fin, code, libelle, type: 'budget','emprunt','don','autre')
+- TableauFigure (id_table_figure, ref, titre, type: 'tableau'|'figure', description, page_pdf)
+
+3. Attributs détaillés et clés primaires
+- Periode
+	- periode_id (PK)
+	- annee (int, unique)
+
+- SourceRecette
+	- source_recette_id (PK)
+	- code (varchar)
+	- libelle (varchar)
+	- categorie (enum: 'fiscale','douaniere','non-fiscale','don')
+	- description (text)
+
+- Recette
+	- recette_id (PK)
+	- periode_id (FK -> Periode.periode_id)
+	- source_recette_id (FK -> SourceRecette.source_recette_id)
+	- montant (decimal)
+	- unite (varchar, ex 'MGA' ou 'M' pour millions)
+	- precision (varchar, ex 'estimé','réalisé')
+	- commentaire (text)
+	- tableau_figure_id (FK -> TableauFigure.id_table_figure)
+
+- TypeDepense
+	- type_depense_id (PK)
+	- code (varchar)
+	- libelle (varchar)
+	- description (text)
+
+- PosteBudgetaire
+	- poste_id (PK)
+	- code_poste (varchar)
+	- libelle_poste (varchar)
+	- type_depense_id (FK -> TypeDepense.type_depense_id)
+	- autorise_pour_annee (boolean)
+
+- Depense
+	- depense_id (PK)
+	- periode_id (FK -> Periode.periode_id)
+	- poste_id (FK -> PosteBudgetaire.poste_id)
+	- montant (decimal)
+	- unite (varchar)
+	- nature (varchar) -- ex: 'fonctionnement','investissement','interet','solde_pension'
+	- admin_id (FK -> Administration.id_admin) NULLABLE
+	- tableau_figure_id (FK -> TableauFigure.id_table_figure)
+	- commentaire (text)
+
+- Administration
+	- id_admin (PK)
+	- code_admin (varchar)
+	- nom (varchar)
+	- niveau (enum: 'central','deconcentre','region','autre')
+
+- Dette
+	- dette_id (PK)
+	- periode_id (FK -> Periode.periode_id)
+	- type_dette (varchar) -- ex 'interne','externe'
+	- montant_interet (decimal)
+	- montant_principal (decimal)
+	- unite (varchar)
+	- tableau_figure_id (FK -> TableauFigure.id_table_figure)
+
+- Don
+	- don_id (PK)
+	- periode_id (FK -> Periode.periode_id)
+	- donneur (varchar)
+	- montant (decimal)
+	- affectation (varchar)
+	- type_aide (varchar)
+	- unite (varchar)
+	- tableau_figure_id (FK -> TableauFigure.id_table_figure)
+
+- SoldePension
+	- solde_id (PK)
+	- periode_id (FK -> Periode.periode_id)
+	- categorie_personnel (varchar)
+	- montant (decimal)
+	- nombre_beneficiaires (int)
+	- tableau_figure_id (FK -> TableauFigure.id_table_figure)
+
+- Investissement
+	- invest_id (PK)
+	- periode_id (FK -> Periode.periode_id)
+	- projet (varchar)
+	- montant (decimal)
+	- source_financement_id (FK -> SourceFinancement.id_fin)
+	- unite (varchar)
+	- tableau_figure_id (FK -> TableauFigure.id_table_figure)
+
+- SourceFinancement
+	- id_fin (PK)
+	- code (varchar)
+	- libelle (varchar)
+	- type (enum: 'budget','emprunt','don','autre')
+
+- TableauFigure
+	- id_table_figure (PK)
+	- ref (varchar) -- ex 'Tableau 1.1' ou 'Figure 2.3'
+	- titre (varchar)
+	- type (enum 'tableau'|'figure')
+	- description (text)
+	- page_pdf (int)
+
+4. Relations et cardinalités (textuelle)
+- Periode 1 - N Recette : une année contient plusieurs enregistrements de recettes (par source)
+- SourceRecette 1 - N Recette : une source peut apparaître plusieurs fois (plusieurs années)
+- Periode 1 - N Depense : une année contient plusieurs dépenses
+- PosteBudgetaire 1 - N Depense : un poste regroupe plusieurs enregistrements (par période)
+- TypeDepense 1 - N PosteBudgetaire : classification des postes
+- Administration 1 - N Depense : une administration peut avoir plusieurs lignes de dépense
+- Periode 1 - N Dette : une année peut contenir plusieurs postes de dette (intérêts, principal)
+- Periode 1 - N Don : plusieurs dons dans l'année
+- SourceFinancement 1 - N Investissement : un financement finance plusieurs projets
+- TableauFigure 1 - N (Recette|Depense|Dette|Don|Investissement|SoldePension) : chaque tableau/figure peut référencer plusieurs enregistrements; chaque enregistrement pointe vers la source (pour traçabilité)
+
+5. Mapping entre `summary.txt` (chapitres) et entités/observations
+
+I. Recettes
+	1. Recettes par source
+		 - (Figure) Recettes totales de l’État  -> Vue : agrégation SUM(Recette.montant) GROUP BY Periode
+	2. Recettes fiscales intérieures
+		 - (Tableau) Recettes fiscales Intérieures -> Filtrer SourceRecette.categorie='fiscale' puis GROUP BY source_recette_id et periode
+	3. Recettes douanières
+		 - (Tableau) Recettes douanières -> Filtrer SourceRecette.categorie='douaniere'
+		 - (Figure) Évolution des recettes fiscales et douanières -> Série temporelle : SUM(Recette.montant) GROUP BY Periode, SourceRecette.categorie
+	4. Recettes non fiscales
+		 - (Tableau) Recettes Non Fiscales -> Filtrer SourceRecette.categorie='non-fiscale'
+	5. Dons
+		 - (Tableau) Composition des Dons -> Entité Don (donneurs, montants, affectations)
+
+II. Dépenses
+ 1. Répartition des dépenses par nature économique
+		- (Tableau) Ventilation des dépenses par rubrique -> Depense JOIN PosteBudgetaire JOIN TypeDepense
+		a. Intérêts de la dette
+			 - (Figure) Variation de l’intérêt de la dette -> Dette.montant_interet par Periode
+		a. Dépenses de soldes et pensions
+			 - (Tableau) Évolution des dépenses de soldes -> SoldePension par Periode
+			 - (Tableau) POSTES BUDGÉTAIRES AUTORISÉES POUR 2025 -> PosteBudgetaire (autorise_pour_annee=true pour 2025)
+		c. Dépenses de fonctionnement des administrations publiques (hors solde)
+			 - (Tableau) Récapitulatif des dépenses de fonctionnement -> Depense WHERE nature='fonctionnement'
+		d. Dépenses d’investissement
+			 - (Figure) Évolution des investissements publics par source de financement -> Investissement GROUP BY Periode, SourceFinancement.type
+
+ 2. Répartition des dépenses selon leur rattachement administratif
+		- (Tableau) Répartition du budget par rattachement administratif -> Depense GROUP BY Administration
+
+III. Déficit budgétaire
+ 1. Situation du déficit
+		- (Figure) Prévision du déficit budgétaire -> Défini comme : (SUM(Depense.montant) - SUM(Recette.montant)) par Periode; stocker ou calculer à la volée
+ 2. Financement du déficit
+		- (Figure) Déficit budgétaire pour l’année 2025 -> Détail par SourceFinancement (emprunts, dons, autres)
+
+6. Contraintes d'intégrité et règles métier
+- Les montants doivent toujours être stockés en nombre décimal normalisé (ex : MAD ou M, préciser unité dans Periode ou champ unite)
+- Toute Recette/Depense doit référencer une Periode
+- PosteBudgetaire.type_depense_id ne peut être NULL lorsque la dépense est classée
+- Pour la traçabilité, chaque import de tableau/figure devra créer un enregistrement `TableauFigure` (ref, titre, page_pdf). Les enregistrements importés auront le champ tableau_figure_id renseigné.
+
+7. Indexation et performance
+- Index sur (periode_id) pour Recette, Depense, Dette, Don, Investissement
+- Index sur (source_recette_id, periode_id) pour Recette
+- Index sur (poste_id, periode_id) pour Depense
+- Index sur (admin_id, periode_id) pour dépense par administration
+
+8. Exemples de requêtes (SQL simplifié) pour générer les vues demandées
+- Recettes totales de l'État par année
+	SELECT p.annee, SUM(r.montant) AS total_recettes
+	FROM Recette r JOIN Periode p ON r.periode_id=p.periode_id
+	GROUP BY p.annee
+
+- Recettes fiscales intérieures (tableau)
+	SELECT sr.libelle, p.annee, SUM(r.montant) AS montant
+	FROM Recette r
+	JOIN SourceRecette sr ON r.source_recette_id=sr.source_recette_id
+	JOIN Periode p ON r.periode_id=p.periode_id
+	WHERE sr.categorie='fiscale'
+	GROUP BY sr.libelle, p.annee
+	ORDER BY p.annee DESC, montant DESC
+
+- Évolution des investissements publics par source de financement (figure)
+	SELECT p.annee, sf.type, SUM(i.montant) AS total_invest
+	FROM Investissement i
+	JOIN SourceFinancement sf ON i.source_financement_id=sf.id_fin
+	JOIN Periode p ON i.periode_id=p.periode_id
+	GROUP BY p.annee, sf.type
+	ORDER BY p.annee
+
+- Déficit budgétaire par année (calcul)
+	SELECT p.annee, (COALESCE(sum_dep.total_dep,0) - COALESCE(sum_rec.total_rec,0)) AS deficit
+	FROM Periode p
+	LEFT JOIN (
+		SELECT periode_id, SUM(montant) AS total_dep FROM Depense GROUP BY periode_id
+	) sum_dep ON sum_dep.periode_id = p.periode_id
+	LEFT JOIN (
+		SELECT periode_id, SUM(montant) AS total_rec FROM Recette GROUP BY periode_id
+	) sum_rec ON sum_rec.periode_id = p.periode_id
+
+9. Format d'import et recommandations
+- Format recommandé : fichiers CSV normalisés pour chaque entité principale (Recette, Depense, Don, Dette, Investissement, PosteBudgetaire, SourceRecette, SourceFinancement, Administration, TableauFigure)
+- Inclure colonnes : ref_tableau_figure, page_pdf, commentaire_source, precision (estimé/realise)
+- Scripts ETL : valider les unités, harmoniser codes (ex : code_poste), vérifier doublons (periode+poste+admin)
+
+10. Extensions et évolutions possibles
+- Ajouter dimensions régionales si données disponibles (Region table + FK in Depense/Recette)
+- Ajouter granularité mensuelle/trim (champ periode_mois ou sous_periode)
+- Ajouter table Users / Role pour gérer annotations citoyennes et validations
+
+11. Résumé rapide (mapping)
+- Table Recette : couvre I.1, I.2, I.3, I.4
+- Table Don : couvre I.5
+- Table Depense + PosteBudgetaire + TypeDepense : couvre II.1, II.2
+- Table Dette + SoldePension : couvre parties liées aux intérêts et soldes
+- Table Investissement + SourceFinancement : couvre dépenses d'investissement
+- Table TableauFigure : référence des tableaux/figures présents dans `BDC-LF-2025-VF.pdf` et `summary.txt`
+
+Fin du document — MCD v1
+
