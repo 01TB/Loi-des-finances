@@ -1,0 +1,39 @@
+I. Recettes
+    1. Recettes par source
+        - (Figure) Recettes totales de l’État
+    2. Recettes fiscales intérieures
+        - (Tableau) Recettes fiscales Intérieures
+    3. Recettes douanières
+        - (Tableau) Recettes douanières
+        - (Figure) Évolution des recettes fiscales et douanières
+    4. Recettes non fiscales
+        - (Tableau) Recettes Non Fiscales
+    5. Dons
+        - (Tableau) Composition des Dons
+
+II. Dépenses
+    1. Répartition des dépenses par nature économique
+        - (Tableau) Ventilation des dépenses par rubrique
+        a. Intérêts de la dette
+            - (Figure) Variation de l’intérêt de la dette
+        a. Dépenses de soldes et pensions
+            - (Tableau) Évolution des dépenses de soldes
+            - (Tableau) POSTES BUDGÉTAIRES AUTORISÉES POUR 2025
+        c. Dépenses de fonctionnement des administrations publiques (hors solde)
+            - (Tableau) Récapitulatif des dépenses de fonctionnement
+        d. Dépenses d’investissement
+            - (Figure) Évolution des investissements publics par source de financement
+    2. Répartition des dépenses selon leur rattachement administratif
+        - (Tableau) Répartition du budget par rattachement administratif
+
+III. Déficit budgétaire
+    1. Situation du déficit
+        - (Figure) Prévision du déficit budgétaire
+    2. Financement du déficit
+        - (Figure) Déficit budgétaire pour l’année 2025
+
+        
+
+
+
+
