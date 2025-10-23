@@ -9,7 +9,7 @@ import jakarta.persistence.*;
 })
 public class Periode {
     @Id
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "annee_debut", nullable = false)

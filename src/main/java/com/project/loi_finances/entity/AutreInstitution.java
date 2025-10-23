@@ -8,7 +8,7 @@ import jakarta.persistence.*;
 })
 public class AutreInstitution {
     @Id
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "titre", nullable = false, length = 150)

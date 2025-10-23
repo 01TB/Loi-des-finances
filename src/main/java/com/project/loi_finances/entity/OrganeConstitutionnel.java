@@ -8,7 +8,7 @@ import jakarta.persistence.*;
 })
 public class OrganeConstitutionnel {
     @Id
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "titre", nullable = false, length = 150)
