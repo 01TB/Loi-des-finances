@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{layouts/admin-layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>Budget Citoyen 2025</title>
+
+    <!-- Custom CSS optimized for SB Admin 2 -->
+    <style>
+        :root {
+            --primary: #4e73df;
+            --secondary: #858796;
+            --success: #1cc88a;
+            --info: #36b9cc;
+            --warning: #f6c23e;
+            --danger: #e74a3b;
+            --light: #f8f9fc;
+            --dark: #5a5c69;
+        }
+
+        body {
+            background-color: #f8f9fc;
+            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #5a5c69;
+        }
+
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, var(--primary) 0%, #224abe 100%);
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        }
+
+        .sidebar-brand {
+            height: 4.375rem;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 800;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            padding: 0.75rem 1rem;
+            border-radius: 0.35rem;
+            margin: 0 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .nav-link:hover {
+            color: white !important;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar .nav-link.active {
+            color: white !important;
+            background: rgba(255, 255, 255, 0.2);
+            font-weight: 600;
+        }
+
+        .content-wrapper {
+            min-height: 100vh;
+            background-color: #f8f9fc;
+        }
+
+        .page-header {
+            border-bottom: 1px solid #e3e6f0;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            border: none;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+            margin-bottom: 1.5rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 2rem 0 rgba(58, 59, 69, 0.15);
+        }
+
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid #e3e6f0;
+            font-weight: 700;
+            padding: 1rem 1.25rem;
+            border-radius: 0.5rem 0.5rem 0 0 !important;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .budget-badge {
+            background: linear-gradient(45deg, var(--primary), #224abe);
+            color: white;
+            padding: 0.6rem 1.25rem;
+            border-radius: 0.5rem;
+            font-weight: 700;
+            font-size: 0.875rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            width: 4rem;
+            height: 4rem;
+            background: linear-gradient(45deg, var(--primary), #224abe);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin: 0 auto 1rem;
+            box-shadow: 0 0.25rem 0.5rem rgba(78, 115, 223, 0.3);
+        }
+
+        .alert {
+            border: none;
+            border-radius: 0.5rem;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-info {
+            background: linear-gradient(45deg, #f0f7ff, #e1effe);
+            border-left: 4px solid var(--info);
+        }
+
+        .alert-warning {
+            background: linear-gradient(45deg, #fffbf0, #fef5e1);
+            border-left: 4px solid var(--warning);
+        }
+
+        .stat-card {
+            transition: transform 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .border-left-primary {
+            border-left: 4px solid var(--primary) !important;
+        }
+
+        .border-left-success {
+            border-left: 4px solid var(--success) !important;
+        }
+
+        .border-left-info {
+            border-left: 4px solid var(--info) !important;
+        }
+
+        .border-left-warning {
+            border-left: 4px solid var(--warning) !important;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--dark);
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .lead {
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: #6e707e;
+            line-height: 1.6;
+        }
+
+        .text-xs {
+            font-size: 0.75rem;
+        }
+
+        .list-unstyled li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .list-unstyled li:last-child {
+            border-bottom: none;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .sidebar {
+                min-height: auto;
+            }
+
+            .card-body {
+                padding: 1rem;
+            }
+
+            .feature-icon {
+                width: 3rem;
+                height: 3rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .display-4 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Improved spacing */
+        .content-section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e3e6f0;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container-fluid">
+        <div class="row">
+
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 content-wrapper">
+                <!-- Page Header -->
+                <div class="page-header pt-4">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <div>
+                            <h1 class="h3 font-weight-bold text-gray-800 mb-1">Budget des Citoyens 2025</h1>
+                            <p class="text-muted mb-0">Ministère de l'Économie et des Finances - République de Madagascar</p>
+                        </div>
+                        <div class="mt-2 mt-md-0">
+                            <span class="budget-badge">
+                                <i class="fas fa-calendar me-2">&nbsp;</i>Loi de Finances 2025
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content Section -->
+                <div class="content-section">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="m-0 font-weight-bold text-primary">
+                                        <i class="fas fa-info-circle me-2">&nbsp;</i>Message Important
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="alert alert-info border-left-primary">
+                                        <h4 class="alert-heading"><i class="fas fa-bullhorn me-3"></i> Ce que vous allez découvrir</h4>
+                                        <p class="mb-0">Ce document simplifié vous explique comment l'État prévoit d'utiliser votre argent en 2025</p>
+                                    </div>
+
+                                    <div class="row align-items-start mt-4">
+                                        <div class="col-lg-8">
+                                            <h4 class="text-primary mb-3">En termes simples...</h4>
+                                            <p class="lead">
+                                                Le <strong class="text-primary">Budget des Citoyens 2025</strong> est une version facile à comprendre
+                                                qui explique comment l'État va dépenser l'argent public l'année prochaine.
+                                            </p>
+
+                                            <div class="mt-4">
+                                                <h5 class="text-dark mb-3">
+                                                    <i class="fas fa-target me-2 text-success"></i>L'objectif de ce document :
+                                                </h5>
+                                                <ul class="list-unstyled">
+                                                    <li class="mb-3">
+                                                        <i class="fas fa-check-circle text-success me-2"></i>
+                                                        <strong>Expliquer simplement</strong> les choix budgétaires de l'État
+                                                    </li>
+                                                    <li class="mb-3">
+                                                        <i class="fas fa-check-circle text-success me-2"></i>
+                                                        <strong>Montrer concrètement</strong> comment votre argent sera utilisé pour les services publics
+                                                    </li>
+                                                    <li class="mb-3">
+                                                        <i class="fas fa-check-circle text-success me-2"></i>
+                                                        <strong>Informer tous les citoyens</strong> sans jargon technique compliqué
+                                                    </li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="mt-4">
+                                                <h5 class="text-dark mb-3">
+                                                    <i class="fas fa-globe me-2 text-info">&nbsp;</i>Disponible pour tous :
+                                                </h5>
+                                                <p class="mb-0">
+                                                    Ce document existe en <strong class="text-info">malagasy</strong> et en
+                                                    <strong class="text-info">français</strong>, et sera diffusé largement
+                                                    sur tout le territoire malgache.
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-4">
+                                            <div class="card border-0 bg-light">
+                                                <div class="card-body text-center py-4">
+                                                    <div class="feature-icon">
+                                                        <i class="fas fa-eye fa-lg"></i>
+                                                    </div>
+                                                    <h5 class="text-dark mb-2">Transparence</h5>
+                                                    <p class="text-muted small mb-4">Comprenez où va votre argent et pourquoi</p>
+
+                                                    <div class="feature-icon">
+                                                        <i class="fas fa-users fa-lg"></i>
+                                                    </div>
+                                                    <h5 class="text-dark mb-2">Participation</h5>
+                                                    <p class="text-muted small mb-4">Tous les citoyens sont concernés et informés</p>
+
+                                                    <div class="feature-icon">
+                                                        <i class="fas fa-share-alt fa-lg"></i>
+                                                    </div>
+                                                    <h5 class="text-dark mb-2">Partagez !</h5>
+                                                    <p class="text-muted small">Diffusez l'information autour de vous</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-4">
+                                        <div class="col-12">
+                                            <div class="alert alert-warning">
+                                                <h6 class="font-weight-bold text-secondary"><i class="fas fa-bullhorn me-2">&nbsp;</i>Votre rôle est important !</h6>
+                                                <p class="mb-0">
+                                                    Nous vous encourageons à <strong>partager ce document</strong> avec votre entourage
+                                                    pour que chacun puisse comprendre le budget de l'État.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Stats Section -->
+                <div class="content-section">
+                    <h4 class="section-title">Aperçu du Document</h4>
+                    <!-- Quick Stats -->
+                    <div class="row">
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="card border-left-primary shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                Document
+                                            </div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">Version Simplifiée</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-file-alt fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="card border-left-info shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                                Accessibilité
+                                            </div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">Pour Tous</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-universal-access fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="card border-left-warning shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                Année
+                                            </div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">2025</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap & jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Custom Script -->
+<script>
+    $(document).ready(function() {
+        // Enhanced card animations
+        $('.card, .stat-card').hover(
+            function() {
+                $(this).css('transform', 'translateY(-5px)');
+            },
+            function() {
+                $(this).css('transform', 'translateY(0)');
+            }
+        );
+
+        // Smooth scrolling for anchor links
+        $('a[href^="#"]').on('click', function(event) {
+            var target = $(this.getAttribute('href'));
+            if (target.length) {
+                event.preventDefault();
+                $('html, body').stop().animate({
+                    scrollTop: target.offset().top - 70
+                }, 1000);
+            }
+        });
+    });
+</script>
+</body>
+</html>
